@@ -2,7 +2,7 @@ id: search
 name: Search
 version: 0.1.0
 apiVersion: kite/plugin/v1
-requires: ">=1.0.0 <2.0.0"
+requires: ">=0.1.0 <2.0.0"
 description: Lets readers search every post and page, in their browser and without a server.
 author:
   name: Kite
