@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Search">
+  <title>Search</title>
+  <g fill="none" stroke="#4A77D6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"
+     transform="translate(32 32) scale(0.82) translate(-32 -32)">
+    <circle cx="27" cy="27" r="16"/>
+    <path d="M39 39 L53 53"/>
+  </g>
+</svg>
