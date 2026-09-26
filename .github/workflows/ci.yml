@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-go@v7
+        with:
+          go-version: "1.26"
+
+      - name: Test the module
+        run: |
+          go vet ./...
+          go test ./...
+
+      - name: Build the module
+        run: make build
+
+      - name: Check the script
+        run: node --check assets/search.js
+
+      # Straight from GitHub: the module proxy can take a while to see a
+      # new commit on Kite's main branch.
+      - name: Install Kite
+        env:
+          GOPRIVATE: github.com/kite-plus
+        run: |
+          go install github.com/kite-plus/kite/cmd/kite@main
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      # Checked the way a site checks a plugin it loads, module included.
+      - name: Verify the plugin
+        run: kite plugin verify .
+
+      - name: Build a site with it
+        run: |
+          site="$RUNNER_TEMP/site"
+          kite init "$site" --yes --workflow=false
+          mkdir -p "$site/content/posts/hello"
+          cat > "$site/content/posts/hello/index.md" <<'MD'
+          ---
+          id: 01J8KQ2P3R4S5T6V7W8X9YZ000
+          title: Hello
+          status: published
+          published_at: 2026-01-01T00:00:00Z
+          ---
+
+          Words a reader can find.
+          MD
+          cd "$site"
+          kite plugin add "$GITHUB_WORKSPACE"
+          kite plugin enable search
+          kite build
+          grep -q "Words a reader can find." public/plugins/search/index.json
