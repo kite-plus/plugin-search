@@ -89,7 +89,9 @@
       })
       .then(function (index) {
         entries = index.map(function (e) {
-          var text = (e.text || "").replace(/\s+/g, " ").trim();
+          // Math is written between \( \) or \[ \] until it is typeset, and
+          // a snippet reads better without them.
+          var text = (e.text || "").replace(/\\[()[\]]/g, "").replace(/\s+/g, " ").trim();
           return { e: e, text: text, title: fold(e.title), tags: fold((e.tags || []).join(" ")), folded: fold(text) };
         });
         status.textContent = "";
@@ -151,7 +153,11 @@
     if (x.e.date) {
       var date = document.createElement("time");
       date.dateTime = x.e.date;
-      date.textContent = new Date(x.e.date).toLocaleDateString(config.lang || undefined);
+      date.textContent = new Date(x.e.date).toLocaleDateString(config.lang || undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
       a.appendChild(date);
     }
     var around = snippet(x, terms);
